@@ -48,11 +48,13 @@ function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedProjectFilter, setSelectedProjectFilter] = useState('All');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState({
     name: '',
     email: '',
     organization: '',
-    message: ''
+    message: '',
+    website: ''
   });
   const [feedback, setFeedback] = useState({ type: 'idle', message: '' });
 
@@ -152,6 +154,11 @@ function App() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
+    if (feedback.message) {
+      setFeedback({ type: 'idle', message: '' });
+    }
+
     setFormState((current) => ({
       ...current,
       [name]: value
@@ -183,13 +190,14 @@ function App() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const cleanName = formState.name.trim();
     const cleanEmail = formState.email.trim();
     const cleanMessage = formState.message.trim();
     const cleanOrganization = formState.organization.trim();
+    const cleanWebsite = formState.website.trim();
 
     if (!cleanName || !cleanEmail || !cleanMessage) {
       setFeedback({
@@ -199,36 +207,51 @@ function App() {
       return;
     }
 
-    const subject = encodeURIComponent(`Portfolio inquiry from ${cleanName}`);
-    const body = encodeURIComponent(
-      [
-        `Name: ${cleanName}`,
-        `Email: ${cleanEmail}`,
-        `Organization: ${cleanOrganization || 'Not provided'}`,
-        '',
-        cleanMessage
-      ].join('\n')
-    );
+    try {
+      setIsSubmitting(true);
+      setFeedback({ type: 'idle', message: '' });
 
-    if (typeof window !== 'undefined') {
-      window.location.href = `mailto:${resumeData.personal.email}?subject=${subject}&body=${body}`;
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: cleanName,
+          email: cleanEmail,
+          organization: cleanOrganization,
+          message: cleanMessage,
+          website: cleanWebsite
+        })
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          result?.message || 'Unable to send your message right now. Please try again or email directly.'
+        );
+      }
+
       setFeedback({
         type: 'success',
-        message: 'Your email client should open now. I will get back to you soon.'
+        message: result?.message || `Message sent successfully to ${resumeData.personal.email}.`
       });
       setFormState({
         name: '',
         email: '',
         organization: '',
-        message: ''
+        message: '',
+        website: ''
       });
-      return;
+    } catch (error) {
+      setFeedback({
+        type: 'error',
+        message: error.message || 'Unable to send your message right now. Please email directly instead.'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setFeedback({
-      type: 'error',
-      message: 'Unable to open your email client in this environment.'
-    });
   };
 
   return (
@@ -751,7 +774,8 @@ function App() {
               </h3>
               <p className="mt-4 text-sm leading-7 text-slate-300">
                 Email is the fastest route for recruiting conversations, internships, collaboration ideas, or technical
-                projects that need both system depth and product polish.
+                projects that need both system depth and product polish. The form on the right now sends directly to my
+                inbox instead of opening a draft.
               </p>
 
               <div className="mt-8 space-y-5 text-sm text-slate-300">
@@ -877,6 +901,19 @@ function App() {
                       placeholder="Tell me a bit about the role, project, or idea."
                     />
                   </label>
+
+                  <label className="hidden" aria-hidden="true">
+                    <span>Website</span>
+                    <input
+                      tabIndex={-1}
+                      autoComplete="off"
+                      className="field-shell"
+                      type="text"
+                      name="website"
+                      value={formState.website}
+                      onChange={handleChange}
+                    />
+                  </label>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -884,9 +921,10 @@ function App() {
                     type="submit"
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-200"
+                    disabled={isSubmitting}
+                    className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Send Message
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </motion.button>
 
                   <div aria-live="polite" className="text-sm">
@@ -895,7 +933,9 @@ function App() {
                         {feedback.message}
                       </p>
                     ) : (
-                      <p className="text-slate-500">Opens your default email client with a pre-filled draft.</p>
+                      <p className="text-slate-500">
+                        Delivers directly to {resumeData.personal.email} through the contact API.
+                      </p>
                     )}
                   </div>
                 </div>

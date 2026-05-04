@@ -8,6 +8,8 @@ The site uses:
 - `Tailwind CSS`
 - `Framer Motion`
 - `Vite`
+- `Express`
+- `Nodemailer`
 
 ## What is included
 
@@ -15,7 +17,7 @@ The site uses:
 - A machine-learning-engineer-first narrative across the hero, about, skills, and experience sections
 - A vertical experience timeline with animated reveal behavior
 - A filterable project gallery
-- A functional contact section with `mailto:` fallback and copy-email support
+- A backend-powered contact form that sends directly to `shravanjbalaji@berkeley.edu`
 - Mobile navigation, reduced-motion handling, and accessibility polish
 
 ## Local development
@@ -32,21 +34,68 @@ Start the dev server:
 npm run dev
 ```
 
+That command starts:
+
+- the Vite client on `http://localhost:5173`
+- the Express contact API on `http://localhost:8787`
+
 Create a production build:
 
 ```bash
 npm run build
 ```
 
-Preview the production build locally:
+Start the production server locally:
 
 ```bash
-npm run preview
+npm start
 ```
+
+## Contact form setup
+
+The default path is now Gmail SMTP with a Google App Password.
+
+Copy the environment template:
+
+```bash
+cp .env.example .env
+```
+
+Then fill in these values:
+
+- `GMAIL_USER`
+- `GMAIL_APP_PASSWORD`
+- `CONTACT_FROM_NAME`
+
+The contact destination is already set to:
+
+- `CONTACT_TO_EMAIL=shravanjbalaji@berkeley.edu`
+
+Recommended Gmail setup:
+
+- Turn on 2-Step Verification for the Google account you will send from
+- Create a 16-character Google App Password for Mail
+- Put that account in `GMAIL_USER`
+- Put the app password in `GMAIL_APP_PASSWORD`
+- Keep `CONTACT_TO_EMAIL=shravanjbalaji@berkeley.edu`
+
+Important Gmail note:
+
+- Gmail usually sends from the authenticated account address, even if you try to set a different `From` email
+- If your Berkeley Google Workspace account does not offer App Passwords, use a personal Gmail sender account and keep the Berkeley address only as the destination
+
+Optional:
+
+- `CONTACT_FROM_EMAIL` can be used if that address is configured as a Gmail alias or approved Workspace sender
+- The generic SMTP fallback variables remain supported if you later switch providers
+
+Without Gmail credentials, the backend will start but the contact endpoint will return a configuration error instead of sending mail.
 
 ## Project structure
 
 ```text
+server/
+  index.js
 src/
   components/
     IntroLanding.jsx
@@ -59,6 +108,7 @@ src/
   App.js
   index.css
   main.jsx
+.env.example
 ```
 
 ## Content model
@@ -81,17 +131,16 @@ That file contains:
 
 ## Customization ideas
 
-- Replace the `mailto:` contact flow with a backend form handler
 - Add project screenshots or media previews
 - Add a downloadable resume button
-- Deploy to Vercel, Netlify, or GitHub Pages
+- Add a persistent datastore for contact analytics or message logs
 
 ## Deployment
 
-This project is ready to deploy as a static frontend.
+This project now includes a backend mail API, so deploy it to a Node-capable host.
 
 Good options:
 
-- [Vercel](https://vercel.com/)
-- [Netlify](https://www.netlify.com/)
-- [GitHub Pages](https://pages.github.com/)
+- [Render](https://render.com/)
+- [Railway](https://railway.app/)
+- [Fly.io](https://fly.io/)
