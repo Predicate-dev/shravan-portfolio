@@ -47,16 +47,17 @@ export function TypingHeadline({
   return (
     <div className={`relative inline-flex ${className}`} aria-label={titles?.[titleIndex % titles.length] || ''}>
       <span className="invisible">{longestTitle}</span>
-      <span className="absolute inset-y-0 left-0 whitespace-nowrap">{displayed}</span>
-      <motion.span
-        aria-hidden="true"
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute inset-y-0 text-electric"
-        style={{ left: `calc(${displayed.length}ch + 0.2rem)` }}
-      >
-        |
-      </motion.span>
+      <span className="absolute inset-y-0 left-0 inline-flex items-center whitespace-nowrap">
+        <span>{displayed}</span>
+        <motion.span
+          aria-hidden="true"
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          className="ml-1 text-electric"
+        >
+          |
+        </motion.span>
+      </span>
     </div>
   );
 }

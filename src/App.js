@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { IntroLanding } from './components/IntroLanding.jsx';
 import { ProjectCard } from './components/ProjectCard.jsx';
 import { SectionReveal } from './components/SectionReveal.jsx';
 import { TimelineItem } from './components/TimelineItem.jsx';
@@ -16,7 +17,8 @@ const navItems = [
 
 const trackedSections = ['home', ...navItems.map((item) => item.id)];
 const projectFilters = ['All', ...new Set(resumeData.projects.map((project) => project.category))];
-const experienceThemes = ['Search Infrastructure', 'Applied ML', 'Cloud Delivery', 'Quantitative Systems'];
+const experienceThemes = ['Applied ML', 'Inference Pipelines', 'Cloud Deployment', 'Behavior Modeling'];
+const introVersion = 'cinematic-ml-intro-v2';
 const contactLinks = [
   { label: 'LinkedIn', href: resumeData.personal.linkedin },
   { label: 'GitHub', href: resumeData.personal.github },
@@ -34,6 +36,13 @@ function SectionHeading({ eyebrow, title, description }) {
 }
 
 function App() {
+  const [introComplete, setIntroComplete] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.sessionStorage.getItem('portfolioIntroSeen') === introVersion;
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -113,8 +122,32 @@ function App() {
     };
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    if (introComplete) {
+      return undefined;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [introComplete]);
+
   const closeMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleEnterIntro = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('portfolioIntroSeen', introVersion);
+    }
+
+    setIntroComplete(true);
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   };
 
   const handleChange = (event) => {
@@ -200,6 +233,8 @@ function App() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-ink text-slate-100">
+      <AnimatePresence>{!introComplete ? <IntroLanding onEnter={handleEnterIntro} /> : null}</AnimatePresence>
+
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
@@ -320,7 +355,13 @@ function App() {
         </AnimatePresence>
       </header>
 
-      <main id="main-content" className="relative">
+      <motion.main
+        id="main-content"
+        initial={false}
+        animate={introComplete ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : { opacity: 0.88, scale: 1.015, filter: 'blur(6px)' }}
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+      >
         <section
           id="home"
           className="mx-auto flex min-h-[calc(100vh-72px)] max-w-7xl items-center px-6 py-16 sm:py-24 lg:px-8"
@@ -370,7 +411,7 @@ function App() {
                   whileTap={{ scale: 0.98 }}
                   className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-200"
                 >
-                  View Selected Work
+                  View ML Work
                 </motion.a>
                 <motion.a
                   href="#contact"
@@ -434,7 +475,7 @@ function App() {
                   <div>
                     <p className="text-xs uppercase tracking-[0.3em] text-electric/75">Current Focus</p>
                     <h2 className="mt-3 max-w-xl font-display text-3xl leading-tight text-white">
-                      Building ambitious systems that move from research to production cleanly.
+                      Building machine learning systems that move from research to production cleanly.
                     </h2>
                   </div>
                   <span className="rounded-full border border-emerald/20 bg-emerald/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-emerald-soft">
@@ -488,8 +529,8 @@ function App() {
         <section id="about" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <SectionHeading
             eyebrow="About"
-            title="Technical depth is strongest when it is easy to understand and trust."
-            description="I tightened the structure of this section so recruiters and engineers can scan your strengths quickly before diving into the longer story."
+            title="Machine learning engineering is strongest when the surrounding system is just as thoughtful as the model."
+            description="This section now leads with modeling, ML infrastructure, and research-to-production translation so the positioning is clear before visitors dive deeper."
           />
 
           <div className="mt-14 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
@@ -560,8 +601,8 @@ function App() {
         <section id="experience" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <SectionHeading
             eyebrow="Experience"
-            title="A timeline with clearer storylines across research, search, and quantitative engineering."
-            description="The layout was already solid, so the improvement here is stronger scanning: thematic chips, cleaner lead-in, and motion that still respects accessibility settings."
+            title="A timeline centered on applied ML, production data systems, and research-grade modeling."
+            description="The story here now reads more clearly as machine learning engineering work across search, research, and deployment-heavy environments."
           />
 
           <SectionReveal className="mt-10 flex flex-wrap gap-3">
@@ -592,8 +633,8 @@ function App() {
         <section id="skills" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <SectionHeading
             eyebrow="Skills"
-            title="A toolkit section that is easier to skim in under a minute."
-            description="I kept the resume-backed categories, but the surrounding layout now better balances depth on the left with analytical credibility and competition results on the right."
+            title="A toolkit that supports modeling, data pipelines, and production deployment."
+            description="The categories are still resume-backed, but the framing is now more explicitly aligned with applied ML engineering and supporting infrastructure work."
           />
 
           <div className="mt-14 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -653,8 +694,8 @@ function App() {
         <section id="projects" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <SectionHeading
             eyebrow="Selected Work"
-            title="A filterable project gallery that is easier to browse quickly."
-            description="This upgrade keeps the motion-rich cards, but adds filtering so visitors can jump straight to product work, internship systems, or research-heavy builds."
+            title="A filterable gallery of ML systems, infrastructure work, and product-facing builds."
+            description="The projects are still interactive, but now the section reads more clearly as a mix of modeling work, pipeline engineering, and production-ready technical systems."
           />
 
           <SectionReveal className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -698,8 +739,8 @@ function App() {
         <section id="contact" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <SectionHeading
             eyebrow="Contact"
-            title="A better close to the page, with direct actions and cleaner form behavior."
-            description="I kept the no-backend approach, but added a copy-email fallback, stronger quick links, and tighter form semantics so this section feels more reliable."
+            title="A cleaner closing section for ML roles, technical collaboration, and engineering conversations."
+            description="The form still stays lightweight, but the section now reads more like a strong endpoint for internships, research collaboration, and machine learning engineering roles."
           />
 
           <div className="mt-14 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -862,7 +903,7 @@ function App() {
             </SectionReveal>
           </div>
         </section>
-      </main>
+      </motion.main>
 
       <footer className="mx-auto max-w-7xl px-6 pb-14 pt-6 lg:px-8">
         <div className="glass-panel rounded-[28px] border border-white/10 px-6 py-5 sm:px-8">

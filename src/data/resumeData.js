@@ -1,26 +1,37 @@
 export const resumeData = {
   personal: {
     name: 'Shravan Balaji',
-    title: 'Software Engineer, ML Builder, and Quant Systems Explorer',
+    title: 'Machine Learning Engineer and Applied AI Systems Builder',
     location: 'Berkeley, California',
     email: 'shravanjbalaji@berkeley.edu',
     phone: '+1 (302) 824-6254',
     linkedin: 'https://www.linkedin.com/in/shravan-balaji',
     github: 'https://www.github.com/Predicate-dev'
   },
+  intro: {
+    eyebrow: 'Machine Learning Engineer',
+    headline: ['Research signal.', 'Production discipline.', 'Built to feel clear.'],
+    description:
+      'I build ML systems that move from experimentation to reliable deployment, with product thinking strong enough to make the work legible.',
+    stats: [
+      { label: 'Model Accuracy', value: '99%+' },
+      { label: 'Latency Improvement', value: '~60%' },
+      { label: 'Pipelines Built', value: 'Research to prod' }
+    ]
+  },
   hero: {
-    tagline: 'Computer Science and Neuroscience at UC Berkeley',
+    tagline: 'Machine Learning Engineer at UC Berkeley',
     rotatingTitles: [
       'Machine Learning Engineer',
-      'Full-Stack Product Builder',
-      'Quantitative Developer',
-      'Data Systems Engineer'
+      'Applied AI Engineer',
+      'ML Systems Builder',
+      'Research-to-Production Engineer'
     ],
-    highlightPills: ['Incoming Quant @ Millennium', 'Amazon Search SDE', 'Berkeley ML Research'],
+    highlightPills: ['ML Research @ Berkeley', 'PyTorch + Scikit Systems', 'Search + Data Pipelines'],
     summary:
-      'I build production-grade software, ML pipelines, and real-time data products that balance research depth with shipping discipline.',
+      'I design and ship machine learning systems, model pipelines, and real-time data infrastructure that balance research depth with production rigor.',
     secondary:
-      'My sweet spot is turning technically demanding work into interfaces and systems that feel fast, clear, and trustworthy.',
+      'My edge is taking technically demanding modeling work and turning it into systems that are measurable, scalable, and easy to trust.',
     metrics: [
       { label: 'CS GPA', value: '3.93 / 4.00' },
       { label: 'Search Latency Gain', value: '~60% faster' },
@@ -44,28 +55,28 @@ export const resumeData = {
       }
     ],
     focusAreas: [
-      'Real-time ML and analytics systems',
-      'Scalable backend pipelines on cloud infrastructure',
-      'Product experiences that turn technical depth into clear user value'
+      'Applied machine learning and behavioral modeling',
+      'Real-time inference and data pipeline systems',
+      'Cloud-backed platforms that translate technical depth into product value'
     ]
   },
   about: {
     paragraphs: [
-      'I am a Berkeley student working at the intersection of machine learning, distributed systems, and product engineering. My recent work spans large-scale search infrastructure at Amazon, research-grade pose estimation and latent behavior modeling, and production ML workflows for seismic quality analysis.',
-      'What excites me most is building tools that feel sharp on the surface because the systems under them are thoughtful, measurable, and robust. I enjoy moving between modeling, backend architecture, experimentation, and polished user-facing experiences.'
+      'I am a Berkeley student focused on machine learning engineering across research, infrastructure, and product-facing systems. My recent work spans search infrastructure at Amazon, pose estimation and latent behavior modeling in research settings, and production ML workflows for seismic quality analysis.',
+      'What excites me most is building systems where the model work is only one part of the craft. I care just as much about pipelines, deployment, latency, evaluation, and the clarity of the final experience as I do about the modeling itself.'
     ],
     strengths: [
       {
-        title: 'Systems That Scale',
-        text: 'I enjoy backend and data-intensive engineering where performance, reliability, and delivery speed all matter.'
+        title: 'Modeling With Rigor',
+        text: 'I like ML work that is measurable and grounded, whether that means supervised modeling, latent representation learning, or applied experimentation.'
       },
       {
-        title: 'Research With Product Taste',
-        text: 'I am comfortable taking ambiguous ML or analytics work and shaping it into something usable and decision-ready.'
+        title: 'Pipelines That Ship',
+        text: 'I build the surrounding system too: ingestion, feature processing, infrastructure, evaluation loops, and deployment paths.'
       },
       {
-        title: 'Execution With Range',
-        text: 'From infrastructure and testing to UX polish, I like shipping the full story instead of only one slice of it.'
+        title: 'Research to Production',
+        text: 'I am especially comfortable translating exploratory ML or analytics work into production-quality systems that people can depend on.'
       }
     ]
   },
@@ -220,6 +231,6 @@ export const resumeData = {
     'NASA TechRise Winner, Team Leader (2023)'
   ],
   footer: {
-    note: 'Built with React, Tailwind CSS, and Framer Motion.'
+    note: 'Built with React, Tailwind CSS, and Framer Motion, with an ML-engineer-first narrative and intro sequence.'
   }
 };
