@@ -1,91 +1,39 @@
 export const resumeData = {
   personal: {
     name: 'Shravan Balaji',
-    title: 'Machine Learning Engineer and Applied AI Systems Builder',
+    initials: 'SB',
+    title: 'Computer Science and Neuroscience at UC Berkeley',
+    positioning: 'Machine learning engineer building search, signal, and systematic data systems.',
     location: 'Berkeley, California',
     email: 'shravanjbalaji@berkeley.edu',
     phone: '+1 (302) 824-6254',
     linkedin: 'https://www.linkedin.com/in/shravan-balaji',
-    github: 'https://www.github.com/Predicate-dev'
-  },
-  intro: {
-    eyebrow: 'Machine Learning Engineer',
-    headline: ['Research signal.', 'Production discipline.', 'Built to feel clear.'],
-    description:
-      'I build ML systems that move from experimentation to reliable deployment, with product thinking strong enough to make the work legible.',
-    stats: [
-      { label: 'Model Accuracy', value: '99%+' },
-      { label: 'Latency Improvement', value: '~60%' },
-      { label: 'Pipelines Built', value: 'Research to prod' }
-    ]
+    github: 'https://www.github.com/Predicate-dev',
+    resume: `${import.meta.env.BASE_URL}Shravan_Balaji_Resume.pdf`
   },
   hero: {
-    tagline: 'Machine Learning Engineer at UC Berkeley',
-    rotatingTitles: [
+    roles: [
+      'Quantitative Developer Intern',
       'Machine Learning Engineer',
-      'Applied AI Engineer',
-      'ML Systems Builder',
-      'Research-to-Production Engineer'
+      'Search Infrastructure Builder',
+      'Applied AI Researcher'
     ],
-    highlightPills: ['ML Research @ Berkeley', 'PyTorch + Scikit Systems', 'Search + Data Pipelines'],
     summary:
-      'I design and ship machine learning systems, model pipelines, and real-time data infrastructure that balance research depth with production rigor.',
-    secondary:
-      'My edge is taking technically demanding modeling work and turning it into systems that are measurable, scalable, and easy to trust.',
+      'I build ML-backed systems where modeling, infrastructure, and product clarity all matter: real-time search ranking at Amazon, seismic anomaly detection at Berkeley, and systematic data research at Millennium.',
+    focus: ['Search and ranking systems', 'Signal quality and anomaly detection', 'Behavioral representation learning'],
     metrics: [
-      { label: 'CS GPA', value: '3.93 / 4.00' },
-      { label: 'Search Latency Gain', value: '~60% faster' },
-      { label: 'Model Accuracy', value: '99%+' }
-    ],
-    sideHighlights: [
-      {
-        label: 'Amazon Search',
-        value: '~60% faster',
-        note: 'Improved feature freshness and ranking latency at large scale.'
-      },
-      {
-        label: 'Seismic ML',
-        value: '99%+ accuracy',
-        note: 'Built classifiers for data-quality detection and monitoring.'
-      },
-      {
-        label: 'Behavior Modeling',
-        value: 'End-to-end pipeline',
-        note: 'Designed latent motif discovery workflows with VAE and HMM models.'
-      }
-    ],
-    focusAreas: [
-      'Applied machine learning and behavioral modeling',
-      'Real-time inference and data pipeline systems',
-      'Cloud-backed platforms that translate technical depth into product value'
-    ]
-  },
-  about: {
-    paragraphs: [
-      'I am a Berkeley student focused on machine learning engineering across research, infrastructure, and product-facing systems. My recent work spans search infrastructure at Amazon, pose estimation and latent behavior modeling in research settings, and production ML workflows for seismic quality analysis.',
-      'What excites me most is building systems where the model work is only one part of the craft. I care just as much about pipelines, deployment, latency, evaluation, and the clarity of the final experience as I do about the modeling itself.'
-    ],
-    strengths: [
-      {
-        title: 'Modeling With Rigor',
-        text: 'I like ML work that is measurable and grounded, whether that means supervised modeling, latent representation learning, or applied experimentation.'
-      },
-      {
-        title: 'Pipelines That Ship',
-        text: 'I build the surrounding system too: ingestion, feature processing, infrastructure, evaluation loops, and deployment paths.'
-      },
-      {
-        title: 'Research to Production',
-        text: 'I am especially comfortable translating exploratory ML or analytics work into production-quality systems that people can depend on.'
-      }
+      { value: '3.93', label: 'CS GPA at Berkeley' },
+      { value: '~60%', label: 'Search latency reduction' },
+      { value: '99%+', label: 'Seismic classifier accuracy' },
+      { value: 'Top 15', label: 'Citadel CQL national finish' }
     ]
   },
   education: {
     school: 'University of California, Berkeley',
-    degree: 'Bachelor of Arts in Computer Science and Neuroscience',
+    degree: 'B.A. Computer Science and Neuroscience',
     location: 'Berkeley, CA',
     graduation: 'Expected May 2027',
-    gpa: '3.93 / 4.00',
+    gpa: 'CS GPA: 3.93 / 4.00',
     honors: ["Dean's List"],
     coursework: [
       'Machine Learning',
@@ -93,144 +41,135 @@ export const resumeData = {
       'Optimization Models',
       'Computer Architecture',
       'Probability Theory',
-      'Linear Algebra'
+      'Linear Algebra',
+      'Multivariable Calculus',
+      'Differential Equations'
     ]
   },
-  skills: [
-    {
-      category: 'Languages',
-      items: ['Java', 'Python', 'Scala', 'SQL', 'TypeScript', 'C', 'C++', 'MATLAB', 'Bash', 'RISC-V']
-    },
-    {
-      category: 'Frameworks',
-      items: ['Apache Spark', 'PyTorch', 'TensorFlow', 'Scikit-Learn', 'Hugging Face', 'AWS CDK']
-    },
-    {
-      category: 'Tools',
-      items: [
-        'AWS S3',
-        'AWS Lambda',
-        'AWS SQS',
-        'AWS SNS',
-        'DynamoDB',
-        'PostgreSQL',
-        'MongoDB',
-        'Pandas',
-        'NumPy',
-        'Git',
-        'JUnit',
-        'Matplotlib',
-        'Seaborn'
-      ]
-    }
+  narrative: [
+    'My work sits at the intersection of ML research and production engineering. I like systems where the model is not an isolated artifact, but part of a larger loop: data quality, feature freshness, inference latency, evaluation, and the human decision that follows.',
+    'Recently, that has meant reducing latency in Amazon Search ranking infrastructure, building seismic data classifiers with real-time monitoring needs, and developing representation learning pipelines for behavioral research.'
   ],
   experience: [
     {
       company: 'Millennium Management',
-      role: 'Incoming Quantitative Developer Intern',
+      role: 'Quantitative Developer Intern',
       location: 'Miami, FL',
       period: 'June 2026 - Present',
-      bullets: ['Incoming Quantitative Developer Intern for Summer 2026.'],
-      tech: ['Python', 'Quantitative Research', 'Data Systems']
+      eyebrow: 'Systematic data platform',
+      bullets: ['Conducting ML research for a systematic data platform as a Summer 2026 quantitative developer intern.'],
+      tech: ['Machine Learning', 'Data Systems', 'Quant Development']
     },
     {
       company: 'Berkeley Brain-AI Resilience Center',
       role: 'Machine Learning Researcher',
       location: 'Berkeley, CA',
       period: 'September 2025 - Present',
+      eyebrow: 'Behavioral representation learning',
       bullets: [
-        'Developing supervised pose estimation models with DeepLabCut and ResNet architectures to extract high-precision spatiotemporal data from rodent behavioral assays.',
-        'Architecting an end-to-end ML pipeline that integrates Variational Autoencoders and Hidden Markov Models to discover latent behavioral motifs and identify biomarkers for stress resilience.'
+        'Developing supervised pose estimation models with DeepLabCut and ResNet architectures to extract high-precision spatiotemporal data from murine behavioral assays.',
+        'Architecting an end-to-end ML pipeline integrating Variational Autoencoders and Hidden Markov Models to discover latent behavioral motifs and identify biomarkers for stress resilience.'
       ],
       tech: ['DeepLabCut', 'ResNet', 'VAE', 'HMM', 'Behavior Modeling']
     },
     {
-      company: 'Amazon Search',
+      company: 'Amazon',
       role: 'Software Development Engineer Intern',
       location: 'Palo Alto, CA',
       period: 'May 2025 - August 2025',
+      eyebrow: 'Real-time search ranking',
       bullets: [
-        'Developed a data ingestion and attribution pipeline with Scala and Apache Spark, deployed through AWS Lambda and DynamoDB with sub-second delivered latency.',
-        "Optimized feature processing for Amazon's real-time search ranking engine, reducing latency by roughly 60% and improving data freshness across millions of daily queries.",
-        'Implemented cloud infrastructure with AWS CDK and automated CI/CD backed by JUnit suites maintaining at least 90% code coverage.'
+        "Optimized feature processing for Amazon's real-time search ranking engine, reducing latency by ~60% and improving feature freshness across millions of daily queries.",
+        'Developed a data ingestion and attribution pipeline with Scala and Apache Spark, deployed via AWS Lambda to DynamoDB with sub-second delivered latency on average.',
+        'Implemented cloud infrastructure with AWS CDK and automated CI/CD using JUnit test suites with over 90% code coverage.'
       ],
-      tech: ['Scala', 'Apache Spark', 'AWS Lambda', 'DynamoDB', 'AWS CDK']
+      tech: ['Scala', 'Apache Spark', 'AWS Lambda', 'DynamoDB', 'AWS CDK', 'JUnit']
     },
     {
       company: 'Berkeley Seismological Laboratory',
       role: 'Machine Learning Engineer',
       location: 'Berkeley, CA',
       period: 'January 2025 - Present',
+      eyebrow: 'Signal quality and monitoring',
       bullets: [
-        'Built and deployed CNN classifiers with PyTorch and Scikit-Learn to identify faulty seismological data with over 99% accuracy.',
-        'Implemented DBSCAN clustering over 104,000 power spectral density plots to segment seismic behavior into meaningful groups.',
-        'Engineered automated visualization workflows with Matplotlib and Seaborn, improving analysis efficiency by 30% and enabling real-time monitoring.'
+        'Developed and deployed CNN classifiers in PyTorch to automate real-time anomaly detection and filter instrument noise, improving core seismic signal quality by 11% with over 99% classification accuracy.',
+        'Implemented high-dimensional DBSCAN clustering over 104,000 power spectral density frequency distribution plots to identify latent structural patterns and anomalies.',
+        'Engineered automated seismic visualization workflows with Matplotlib and Seaborn, improving analysis efficiency by 30% and enabling real-time monitoring.'
       ],
       tech: ['PyTorch', 'Scikit-Learn', 'DBSCAN', 'Matplotlib', 'Seaborn']
+    },
+    {
+      company: 'UCSF Health',
+      role: 'Machine Learning Researcher',
+      location: 'San Francisco, CA',
+      period: 'November 2024 - August 2025',
+      eyebrow: 'Neuroscience ML',
+      bullets: [
+        'Trained and evaluated Random Forest classifiers on multi-channel sleep EEG and EMG data from murine behavioral experiments using Scikit-Learn and DeepLabCut.'
+      ],
+      tech: ['Scikit-Learn', 'DeepLabCut', 'Random Forests', 'EEG', 'EMG']
     }
   ],
   projects: [
     {
       title: 'Voice Trainer',
-      category: 'Product Project',
-      blurb:
-        'A real-time speech coaching system that analyzes pacing, volume, pitch variation, and transcript quality with instant feedback.',
-      metrics: ['Sub-100ms feedback', 'Offline speech recognition', 'Post-session review'],
-      tech: ['Python', 'NumPy', 'Vosk', 'PyTorch', 'Whisper', 'pyttsx3'],
-      challenge: 'Build a speech feedback loop that feels immediate during a live session without sacrificing transcription quality.',
-      outcome:
-        'Combined low-latency live recognition with deeper post-session analysis to create a modular coaching workflow for speaking performance.',
+      category: '1st Place Hackathon',
+      summary:
+        'A real-time speech coaching engine that measures pacing, volume, pitch variation, and transcript structure with immediate feedback.',
+      impact: ['Sub-100ms feedback latency', '1st place, Hiya VoiceAI Hackathon', 'Offline and post-session analysis'],
+      tech: ['Python', 'Vosk', 'PyTorch', 'NumPy', 'Whisper'],
       link: 'https://github.com/Predicate-dev/voice-trainer'
     },
     {
       title: 'Search Feature Attribution Pipeline',
-      category: 'Internship System',
-      blurb:
-        'A backend data pipeline for real-time ranking features that improved freshness and reduced critical search latency.',
-      metrics: ['~60% latency reduction', 'Sub-second delivery', '90%+ test coverage'],
+      category: 'Amazon Search',
+      summary:
+        'A data ingestion and attribution system for real-time ranking signals, built for feature freshness and low-latency delivery.',
+      impact: ['~60% latency reduction', 'Sub-second delivery', '90%+ test coverage'],
       tech: ['Scala', 'Apache Spark', 'AWS Lambda', 'DynamoDB', 'AWS CDK'],
-      challenge:
-        'Improve ranking feature delivery speed while keeping ingestion reliable at search-engine scale.',
-      outcome:
-        'Shipped ingestion, processing, infrastructure, and CI/CD improvements that accelerated feature computation across millions of daily queries.',
       link: null
     },
     {
       title: 'Seismic Fault Detection Suite',
-      category: 'Research Platform',
-      blurb:
-        'A model-driven seismic quality analysis workflow for identifying corrupted traces and monitoring data health in real time.',
-      metrics: ['99%+ classifier accuracy', '104k plots clustered', '30% faster analysis'],
+      category: 'Research ML',
+      summary:
+        'A model-driven seismic quality workflow for detecting corrupted traces, clustering spectral behavior, and monitoring data health.',
+      impact: ['99%+ classifier accuracy', '104,000 PSD plots clustered', '30% faster analysis'],
       tech: ['PyTorch', 'Scikit-Learn', 'DBSCAN', 'Matplotlib', 'Seaborn'],
-      challenge:
-        'Increase data quality and observability across noisy seismological inputs used in downstream research workflows.',
-      outcome:
-        'Delivered classification, clustering, and visualization tooling that improved quality control speed and supported continuous monitoring.',
       link: null
     },
     {
       title: 'WordNet Graph Explorer',
-      category: 'Computer Science Project',
-      blurb:
-        'A semantic lexicon and graph analysis tool for modeling word relationships with strong reliability guarantees.',
-      metrics: ['Graph-based architecture', 'JUnit validated', '95% reliability target'],
+      category: 'Graph Systems',
+      summary:
+        'A Java semantic lexicon that models word relationships and meanings through graph data structures with assessment-grade reliability.',
+      impact: ['Graph-based semantic model', 'Comprehensive JUnit testing', '95% reliability target'],
       tech: ['Java', 'Graph Algorithms', 'JUnit', 'Git'],
-      challenge:
-        'Represent rich semantic relationships in a way that stays fast to query and easy to validate during assessment.',
-      outcome:
-        'Built a Java graph model for lexical relationships and backed it with comprehensive testing for consistent behavior under evaluation.',
       link: null
     }
   ],
-  achievements: [
-    'Citadel Collegiate Quant League, Top 15 National (2025)',
-    'American Invitational Mathematics Examination Qualifier (2022 - 2023)',
-    'Delaware Mathematics League Individual 1st Place, Regional (2020 and 2023)',
-    'United States National Chemistry Olympiad National Qualifier, Top 150 (2022 and 2023)',
-    'United States Biology Olympiad Semifinalist, Top 225 (2021 and 2023)',
-    'NASA TechRise Winner, Team Leader (2023)'
+  skills: [
+    {
+      category: 'Programming',
+      items: ['Java', 'Python', 'Scala', 'SQL', 'C', 'C++', 'MATLAB', 'Bash', 'RISC-V', 'TypeScript']
+    },
+    {
+      category: 'Cloud and Data',
+      items: ['AWS S3', 'AWS Lambda', 'AWS SQS', 'AWS SNS', 'DynamoDB', 'Apache Spark', 'PostgreSQL', 'MongoDB']
+    },
+    {
+      category: 'ML and Analytics',
+      items: ['Pandas', 'Scikit-Learn', 'PyTorch', 'TensorFlow', 'Hugging Face', 'NumPy', 'Matplotlib', 'Seaborn']
+    }
   ],
-  footer: {
-    note: 'Built with React, Tailwind CSS, and Framer Motion, with an ML-engineer-first narrative and intro sequence.'
-  }
+  achievements: [
+    'Citadel Collegiate Quant League, Top 15 National',
+    'AIME Qualifier, 2x',
+    'USNCO National Qualifier, Top 200',
+    'USABO Top 225 National',
+    'NASA TechRise Winner, Team Leader',
+    'Delaware Math League 1st Place, 2x',
+    'DelawareLaunch Biotech Pitch Competition 1st Place',
+    '1590 SAT and 36 ACT'
+  ]
 };

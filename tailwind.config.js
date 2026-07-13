@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#060816',
-        'ink-soft': '#0b1220',
-        graphite: '#111827',
+        ink: '#03110d',
+        'ink-soft': '#071713',
+        graphite: '#16211d',
         electric: {
           DEFAULT: '#38bdf8',
           soft: '#7dd3fc',

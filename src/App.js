@@ -1,980 +1,551 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { IntroLanding } from './components/IntroLanding.jsx';
-import { ProjectCard } from './components/ProjectCard.jsx';
-import { SectionReveal } from './components/SectionReveal.jsx';
-import { TimelineItem } from './components/TimelineItem.jsx';
-import { TypingHeadline } from './components/TypingHeadline.jsx';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
 import { resumeData } from './data/resumeData.js';
 
 const navItems = [
-  { id: 'about', label: 'About', href: '#about' },
-  { id: 'experience', label: 'Experience', href: '#experience' },
-  { id: 'skills', label: 'Skills', href: '#skills' },
-  { id: 'projects', label: 'Work', href: '#projects' },
-  { id: 'contact', label: 'Contact', href: '#contact' }
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'contact', label: 'Contact' }
 ];
 
 const trackedSections = ['home', ...navItems.map((item) => item.id)];
-const projectFilters = ['All', ...new Set(resumeData.projects.map((project) => project.category))];
-const experienceThemes = ['Applied ML', 'Inference Pipelines', 'Cloud Deployment', 'Behavior Modeling'];
-const introVersion = 'cinematic-ml-intro-v2';
-const contactLinks = [
-  { label: 'LinkedIn', href: resumeData.personal.linkedin },
-  { label: 'GitHub', href: resumeData.personal.github },
-  { label: 'Email', href: `mailto:${resumeData.personal.email}` }
-];
 
-function SectionHeading({ eyebrow, title, description }) {
+function Reveal({ children, className = '', delay = 0 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <SectionReveal className="max-w-3xl">
-      <p className="text-sm uppercase tracking-[0.36em] text-electric/75">{eyebrow}</p>
-      <h2 className="mt-4 font-display text-4xl text-white sm:text-5xl">{title}</h2>
-      <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">{description}</p>
-    </SectionReveal>
+    <motion.div
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
+      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={shouldReduceMotion ? undefined : { once: true, amount: 0.22 }}
+      transition={shouldReduceMotion ? undefined : { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function SectionHeader({ kicker, title, description }) {
+  return (
+    <Reveal className="mx-auto max-w-3xl text-center">
+      <p className="eyebrow">{kicker}</p>
+      <h2 className="mt-4 font-display text-3xl leading-tight text-white sm:text-5xl">{title}</h2>
+      {description ? <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">{description}</p> : null}
+    </Reveal>
+  );
+}
+
+function SignalPanel() {
+  const cells = useMemo(
+    () =>
+      Array.from({ length: 42 }, (_, index) => ({
+        id: index,
+        height: 22 + ((index * 17) % 70),
+        delay: (index % 9) * 0.08,
+        active: [2, 5, 9, 14, 19, 23, 30, 37].includes(index)
+      })),
+    []
+  );
+
+  return (
+    <div className="relative min-h-[34rem] overflow-hidden border border-white/10 bg-[#07120f] p-5 shadow-[0_30px_120px_rgba(16,185,129,0.18)] sm:p-7">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] bg-[size:44px_44px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(20,184,166,0.12),transparent_38%,rgba(245,158,11,0.08))]" />
+
+      <div className="relative flex items-center justify-between border-b border-white/10 pb-5">
+        <div>
+          <p className="eyebrow text-emerald-200/80">Live Signal Surface</p>
+          <h2 className="mt-3 font-display text-2xl text-white">Search, seismic, and behavior data</h2>
+        </div>
+        <span className="border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-100">
+          ML Systems
+        </span>
+      </div>
+
+      <div className="relative mt-10 grid grid-cols-7 gap-3">
+        {cells.map((cell) => (
+          <motion.span
+            key={cell.id}
+            initial={{ opacity: 0.35, scaleY: 0.72 }}
+            animate={{ opacity: cell.active ? [0.55, 1, 0.6] : [0.28, 0.62, 0.32], scaleY: [0.74, 1, 0.8] }}
+            transition={{ duration: 3.4, repeat: Infinity, delay: cell.delay, ease: 'easeInOut' }}
+            className={`block origin-bottom border ${
+              cell.active
+                ? 'border-emerald-200/40 bg-emerald-300/35 shadow-[0_0_28px_rgba(110,231,183,0.38)]'
+                : 'border-white/10 bg-white/[0.055]'
+            }`}
+            style={{ height: `${cell.height}px` }}
+          />
+        ))}
+      </div>
+
+      <div className="relative mt-10 grid gap-3 sm:grid-cols-3">
+        {resumeData.hero.focus.map((item) => (
+          <div key={item} className="border border-white/10 bg-black/20 p-4">
+            <p className="text-sm leading-6 text-slate-200">{item}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
 function App() {
-  const [introComplete, setIntroComplete] = useState(() => {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return window.sessionStorage.getItem('portfolioIntroSeen') === introVersion;
-  });
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProjectFilter, setSelectedProjectFilter] = useState('All');
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formState, setFormState] = useState({
-    name: '',
-    email: '',
-    organization: '',
-    message: '',
-    website: ''
-  });
-  const [feedback, setFeedback] = useState({ type: 'idle', message: '' });
+  const [formState, setFormState] = useState({ name: '', email: '', organization: '', message: '', website: '' });
+  const [feedback, setFeedback] = useState('');
 
+  const projectFilters = useMemo(
+    () => ['All', ...new Set(resumeData.projects.map((project) => project.category))],
+    []
+  );
   const filteredProjects =
     selectedProjectFilter === 'All'
       ? resumeData.projects
       : resumeData.projects.filter((project) => project.category === selectedProjectFilter);
 
   useEffect(() => {
-    const sectionElements = trackedSections
-      .map((sectionId) => document.getElementById(sectionId))
-      .filter(Boolean);
-
+    const sections = trackedSections.map((sectionId) => document.getElementById(sectionId)).filter(Boolean);
     const observer = new IntersectionObserver(
       (entries) => {
-        const visibleEntries = entries
+        const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
 
-        if (visibleEntries[0]?.target?.id) {
-          setActiveSection(visibleEntries[0].target.id);
+        if (visible[0]?.target?.id) {
+          setActiveSection(visible[0].target.id);
         }
       },
-      {
-        rootMargin: '-42% 0px -42% 0px',
-        threshold: [0.15, 0.35, 0.6]
-      }
+      { rootMargin: '-42% 0px -45% 0px', threshold: [0.2, 0.45, 0.7] }
     );
 
-    sectionElements.forEach((element) => observer.observe(element));
-
-    const handleScroll = () => {
-      const root = document.documentElement;
-      const scrollableHeight = root.scrollHeight - window.innerHeight;
-      const nextProgress = scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
-      setScrollProgress(Math.min(100, Math.max(0, nextProgress)));
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', handleScroll);
-    };
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (!mobileMenuOpen) {
-      return undefined;
-    }
-
-    const originalOverflow = document.body.style.overflow;
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [mobileMenuOpen]);
-
-  useEffect(() => {
-    if (introComplete) {
-      return undefined;
-    }
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [introComplete]);
-
-  const closeMenu = () => {
-    setMobileMenuOpen(false);
-  };
-
-  const handleEnterIntro = () => {
-    if (typeof window !== 'undefined') {
-      window.sessionStorage.setItem('portfolioIntroSeen', introVersion);
-    }
-
-    setIntroComplete(true);
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    if (feedback.message) {
-      setFeedback({ type: 'idle', message: '' });
-    }
-
-    setFormState((current) => ({
-      ...current,
-      [name]: value
-    }));
+    setFeedback('');
+    setFormState((current) => ({ ...current, [name]: value }));
   };
 
-  const handleCopyEmail = async () => {
-    if (!navigator?.clipboard) {
-      setFeedback({
-        type: 'error',
-        message: 'Clipboard access is not available in this browser.'
-      });
-      return;
-    }
-
+  const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(resumeData.personal.email);
       setCopiedEmail(true);
-      setFeedback({
-        type: 'success',
-        message: 'Email copied. You can paste it anywhere.'
-      });
       window.setTimeout(() => setCopiedEmail(false), 1800);
     } catch {
-      setFeedback({
-        type: 'error',
-        message: 'Copy failed. Please use the email link directly.'
-      });
+      window.location.href = `mailto:${resumeData.personal.email}`;
     }
+  };
+
+  const openMailFallback = ({ name, email, organization, message }) => {
+    const subject = encodeURIComponent(`Portfolio inquiry from ${name}`);
+    const body = encodeURIComponent(
+      [`Name: ${name}`, `Email: ${email}`, `Organization: ${organization || 'Not provided'}`, '', message].join('\n')
+    );
+    window.location.href = `mailto:${resumeData.personal.email}?subject=${subject}&body=${body}`;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const cleanName = formState.name.trim();
-    const cleanEmail = formState.email.trim();
-    const cleanMessage = formState.message.trim();
-    const cleanOrganization = formState.organization.trim();
-    const cleanWebsite = formState.website.trim();
+    const clean = {
+      name: formState.name.trim(),
+      email: formState.email.trim(),
+      organization: formState.organization.trim(),
+      message: formState.message.trim(),
+      website: formState.website.trim()
+    };
 
-    if (!cleanName || !cleanEmail || !cleanMessage) {
-      setFeedback({
-        type: 'error',
-        message: 'Please add your name, email, and message before sending.'
-      });
+    if (!clean.name || !clean.email || !clean.message) {
+      setFeedback('Please add your name, email, and message.');
+      return;
+    }
+
+    if (clean.website) {
       return;
     }
 
     try {
-      setIsSubmitting(true);
-      setFeedback({ type: 'idle', message: '' });
-
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: cleanName,
-          email: cleanEmail,
-          organization: cleanOrganization,
-          message: cleanMessage,
-          website: cleanWebsite
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clean)
       });
-
-      const result = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(
-          result?.message || 'Unable to send your message right now. Please try again or email directly.'
-        );
+        throw new Error('Contact API unavailable');
       }
 
-      setFeedback({
-        type: 'success',
-        message: result?.message || `Message sent successfully to ${resumeData.personal.email}.`
-      });
-      setFormState({
-        name: '',
-        email: '',
-        organization: '',
-        message: '',
-        website: ''
-      });
-    } catch (error) {
-      setFeedback({
-        type: 'error',
-        message: error.message || 'Unable to send your message right now. Please email directly instead.'
-      });
-    } finally {
-      setIsSubmitting(false);
+      setFeedback('Message sent. Thank you.');
+      setFormState({ name: '', email: '', organization: '', message: '', website: '' });
+    } catch {
+      setFeedback('Opening your email client with a ready-to-send draft.');
+      openMailFallback(clean);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-ink text-slate-100">
-      <AnimatePresence>{!introComplete ? <IntroLanding onEnter={handleEnterIntro} /> : null}</AnimatePresence>
-
+    <div className="min-h-screen bg-ink text-slate-100">
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
 
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-1 bg-white/5">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-electric via-electric-soft to-emerald"
-          style={{ width: `${scrollProgress}%` }}
-        />
-      </div>
-
-      <div className="pointer-events-none fixed inset-0 bg-hero-mesh" />
-      <div className="pointer-events-none fixed left-1/2 top-[-12rem] h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-electric/10 blur-3xl" />
-      <div className="pointer-events-none fixed bottom-[-10rem] right-[-8rem] h-[24rem] w-[24rem] rounded-full bg-emerald/10 blur-3xl" />
-
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/80 backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <a href="#home" className="font-display text-lg tracking-[0.28em] text-white">
-            SB
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/88 backdrop-blur-xl">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+          <a href="#home" className="font-display text-lg font-bold tracking-[0.28em] text-white">
+            {resumeData.personal.initials}
           </a>
 
-          <div className="hidden items-center gap-3 md:flex">
-            {navItems.map((item) => {
-              const isActive = activeSection === item.id;
-
-              return (
-                <motion.a
-                  key={item.href}
-                  href={item.href}
-                  whileHover={{ y: -2 }}
-                  className={`rounded-full px-4 py-2 text-sm uppercase tracking-[0.2em] transition ${
-                    isActive
-                      ? 'bg-white/[0.06] text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.16)]'
-                      : 'text-slate-300 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </motion.a>
-              );
-            })}
+          <div className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={`nav-link ${activeSection === item.id ? 'nav-link-active' : ''}`}
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
 
           <div className="flex items-center gap-3">
-            <motion.a
-              href={resumeData.personal.github}
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="hidden rounded-full border border-electric/20 bg-electric/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-electric transition hover:border-electric/40 hover:bg-electric/15 sm:inline-flex"
-            >
-              GitHub
-            </motion.a>
-
-            <motion.button
+            <a href={resumeData.personal.resume} target="_blank" rel="noreferrer" className="btn-primary hidden sm:inline-flex">
+              Resume
+            </a>
+            <button
               type="button"
+              className="btn-ghost md:hidden"
               aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
               onClick={() => setMobileMenuOpen((current) => !current)}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs uppercase tracking-[0.22em] text-white transition hover:border-electric/30 md:hidden"
             >
-              <span>{mobileMenuOpen ? 'Close' : 'Menu'}</span>
-            </motion.button>
+              {mobileMenuOpen ? 'Close' : 'Menu'}
+            </button>
           </div>
         </nav>
 
-        <AnimatePresence>
-          {mobileMenuOpen ? (
-            <motion.div
-              id="mobile-menu"
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-              className="border-t border-white/10 bg-ink-soft/95 px-6 py-5 shadow-2xl backdrop-blur-xl md:hidden"
-            >
-              <div className="flex flex-col gap-3">
+        {mobileMenuOpen ? (
+          <div className="border-t border-white/10 bg-ink-soft px-5 py-4 md:hidden">
+            <div className="grid gap-2">
+              {navItems.map((item) => (
                 <a
-                  href="#home"
-                  onClick={closeMenu}
-                  className="rounded-2xl border border-white/10 px-4 py-3 text-sm uppercase tracking-[0.22em] text-white"
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="border border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-slate-200"
                 >
-                  Home
+                  {item.label}
                 </a>
-
-                {navItems.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMenu}
-                    className={`rounded-2xl border px-4 py-3 text-sm uppercase tracking-[0.22em] transition ${
-                      activeSection === item.id
-                        ? 'border-electric/30 bg-electric/10 text-electric-soft'
-                        : 'border-white/10 text-slate-300'
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </div>
-
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                {contactLinks.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target={link.href.startsWith('http') ? '_blank' : undefined}
-                    rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center text-xs uppercase tracking-[0.22em] text-slate-200"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </header>
 
-      <motion.main
-        id="main-content"
-        initial={false}
-        animate={introComplete ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : { opacity: 0.88, scale: 1.015, filter: 'blur(6px)' }}
-        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-        className="relative"
-      >
-        <section
-          id="home"
-          className="mx-auto flex min-h-[calc(100vh-72px)] max-w-7xl items-center px-6 py-16 sm:py-24 lg:px-8"
-        >
-          <div className="grid w-full gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
-            <SectionReveal className="max-w-3xl">
-              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs uppercase tracking-[0.28em] text-slate-300">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald shadow-[0_0_20px_rgba(52,211,153,0.8)]" />
-                {resumeData.hero.tagline}
-              </div>
+      <main id="main-content">
+        <section id="home" className="relative overflow-hidden border-b border-white/10">
+          <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(5,150,105,0.16),transparent_32%,rgba(14,165,233,0.08)_65%,rgba(245,158,11,0.08))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.04)_1px,transparent_1px)] bg-[size:72px_72px]" />
 
-              <div className="mt-5 flex flex-wrap gap-2">
-                {resumeData.hero.highlightPills.map((pill) => (
-                  <span
-                    key={pill}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300"
-                  >
-                    {pill}
-                  </span>
-                ))}
-              </div>
-
-              <h1 className="mt-8 font-display text-5xl leading-none text-white sm:text-6xl lg:text-7xl">
-                {resumeData.personal.name}
-              </h1>
-
-              <p className="mt-4 text-sm uppercase tracking-[0.28em] text-slate-400 sm:text-base">
-                {resumeData.personal.title}
-              </p>
-
-              <TypingHeadline
-                titles={resumeData.hero.rotatingTitles}
-                className="mt-5 flex min-h-[3.5rem] items-center font-display text-2xl text-electric sm:min-h-[4rem] sm:text-4xl"
-              />
-
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl">
-                {resumeData.hero.summary}
-              </p>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
-                {resumeData.hero.secondary}
-              </p>
-
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-                <motion.a
-                  href="#projects"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-200"
-                >
-                  View ML Work
-                </motion.a>
-                <motion.a
-                  href="#contact"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:border-electric/30 hover:bg-electric/10"
-                >
-                  Start a Conversation
-                </motion.a>
-                <motion.a
-                  href={resumeData.personal.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="rounded-full border border-white/10 bg-transparent px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-emerald/30 hover:text-white"
-                >
-                  View LinkedIn
-                </motion.a>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <span className="rounded-full border border-emerald/20 bg-emerald/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-emerald-soft">
-                  Open to Summer 2026
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-300">
-                  Berkeley, California
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-300">
-                  Expected May 2027
-                </span>
-              </div>
-
-              <div className="mt-12 grid gap-4 sm:grid-cols-3">
-                {resumeData.hero.metrics.map((metric, index) => (
-                  <motion.div
-                    key={metric.label}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.25 }}
-                    className="glass-panel rounded-[24px] border border-white/10 p-5"
-                  >
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{metric.label}</p>
-                    <p className="mt-3 font-display text-2xl text-white">{metric.value}</p>
-                    <p className="mt-3 text-sm leading-6 text-slate-400">
-                      {resumeData.hero.focusAreas[index] || resumeData.personal.title}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </SectionReveal>
-
-            <SectionReveal direction="left" delay={0.12}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.35 }}
-                className="glass-panel section-grid relative overflow-hidden rounded-[32px] border border-white/10 p-6 shadow-glow-blue sm:p-8"
-              >
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-electric/60 to-transparent" />
-
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-electric/75">Current Focus</p>
-                    <h2 className="mt-3 max-w-xl font-display text-3xl leading-tight text-white">
-                      Building machine learning systems that move from research to production cleanly.
-                    </h2>
-                  </div>
-                  <span className="rounded-full border border-emerald/20 bg-emerald/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-emerald-soft">
-                    Summer 2026
-                  </span>
-                </div>
-
-                <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                  Recent work spans large-scale ranking infrastructure, ML pipelines for research, and model-driven analysis
-                  systems that prioritize both speed and clarity.
+          <div className="relative mx-auto grid min-h-[calc(100vh-73px)] max-w-7xl gap-12 px-5 py-16 sm:py-20 lg:grid-cols-[0.98fr_1.02fr] lg:items-center lg:px-8">
+            <div>
+              <Reveal>
+                <p className="eyebrow">Berkeley CS + Neuroscience</p>
+                <h1 className="mt-5 font-display text-5xl leading-[0.95] text-white sm:text-7xl lg:text-8xl">
+                  {resumeData.personal.name}
+                </h1>
+                <p className="mt-6 max-w-3xl text-xl leading-9 text-slate-200 sm:text-2xl">
+                  {resumeData.personal.positioning}
                 </p>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">{resumeData.hero.summary}</p>
+              </Reveal>
 
-                <div className="mt-8 grid gap-4">
-                  {resumeData.hero.sideHighlights.map((highlight) => (
-                    <motion.div
-                      key={highlight.label}
-                      whileHover={{ x: 4 }}
-                      className="rounded-[24px] border border-white/10 bg-black/20 p-5"
-                    >
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-                        <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{highlight.label}</p>
-                        <p className="font-display text-xl text-white">{highlight.value}</p>
-                      </div>
-                      <p className="mt-3 text-sm leading-7 text-slate-300">{highlight.note}</p>
-                    </motion.div>
-                  ))}
-                </div>
+              <Reveal delay={0.08} className="mt-8 flex flex-wrap gap-3">
+                {resumeData.hero.roles.map((role) => (
+                  <span key={role} className="chip">
+                    {role}
+                  </span>
+                ))}
+              </Reveal>
 
-                <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Education</p>
-                    <h3 className="mt-3 font-display text-2xl text-white">{resumeData.education.school}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-300">{resumeData.education.degree}</p>
-                    <p className="mt-4 text-sm text-slate-400">{resumeData.education.graduation}</p>
+              <Reveal delay={0.14} className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <a href="#projects" className="btn-primary">
+                  View Work
+                </a>
+                <a href={resumeData.personal.resume} target="_blank" rel="noreferrer" className="btn-secondary">
+                  Download Resume
+                </a>
+                <a href={resumeData.personal.linkedin} target="_blank" rel="noreferrer" className="btn-ghost">
+                  LinkedIn
+                </a>
+              </Reveal>
+
+              <Reveal delay={0.2} className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {resumeData.hero.metrics.map((metric) => (
+                  <div key={metric.label} className="metric-tile">
+                    <p className="font-display text-3xl text-white">{metric.value}</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-400">{metric.label}</p>
                   </div>
+                ))}
+              </Reveal>
+            </div>
 
-                  <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Direct Reach</p>
-                    <div className="mt-3 space-y-3 text-sm leading-7 text-slate-300">
-                      <p>{resumeData.personal.email}</p>
-                      <p>{resumeData.personal.phone}</p>
-                      <p>{resumeData.personal.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </SectionReveal>
+            <Reveal delay={0.1}>
+              <SignalPanel />
+            </Reveal>
           </div>
         </section>
 
-        <section id="about" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <SectionHeading
-            eyebrow="About"
-            title="Machine learning engineering is strongest when the surrounding system is just as thoughtful as the model."
-            description="This section now leads with modeling, ML infrastructure, and research-to-production translation so the positioning is clear before visitors dive deeper."
+        <section id="about" className="section-shell">
+          <SectionHeader
+            kicker="About"
+            title="I turn noisy data into reliable ML systems."
+            description="My strongest work combines modeling judgment with the infrastructure needed to make that judgment useful in production."
           />
 
-          <div className="mt-14 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
-            <SectionReveal className="glass-panel rounded-[32px] border border-white/10 p-7 shadow-glow-blue sm:p-8">
-              <div className="space-y-6 text-base leading-8 text-slate-300">
-                {resumeData.about.paragraphs.map((paragraph) => (
+          <div className="mx-auto mt-14 grid max-w-7xl gap-6 px-5 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
+            <Reveal className="content-panel p-6 sm:p-8">
+              <div className="space-y-6 text-base leading-8 text-slate-300 sm:text-lg">
+                {resumeData.narrative.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
+            </Reveal>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                {resumeData.about.strengths.map((strength) => (
-                  <motion.div
-                    key={strength.title}
-                    whileHover={{ y: -4 }}
-                    className="rounded-[24px] border border-white/10 bg-black/20 p-5"
-                  >
-                    <p className="text-xs uppercase tracking-[0.22em] text-electric/75">{strength.title}</p>
-                    <p className="mt-3 text-sm leading-7 text-slate-300">{strength.text}</p>
-                  </motion.div>
-                ))}
+            <Reveal delay={0.08} className="content-panel p-6 sm:p-8">
+              <p className="eyebrow text-emerald-200/80">Education</p>
+              <h3 className="mt-4 font-display text-3xl text-white">{resumeData.education.school}</h3>
+              <p className="mt-4 text-slate-300">{resumeData.education.degree}</p>
+              <div className="mt-6 grid gap-3 text-sm text-slate-300">
+                <p>{resumeData.education.gpa}</p>
+                <p>{resumeData.education.graduation}</p>
+                <p>{resumeData.education.honors.join(', ')}</p>
               </div>
-            </SectionReveal>
-
-            <SectionReveal direction="left" delay={0.1}>
-              <div className="grid gap-6">
-                <div className="glass-panel rounded-[28px] border border-white/10 p-6">
-                  <p className="text-xs uppercase tracking-[0.24em] text-electric/75">Coursework</p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {resumeData.education.coursework.map((course) => (
-                      <span
-                        key={course}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300"
-                      >
-                        {course}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="glass-panel rounded-[28px] border border-white/10 p-6">
-                  <p className="text-xs uppercase tracking-[0.24em] text-emerald/75">Honors</p>
-                  <div className="mt-4 space-y-3">
-                    <p className="font-display text-3xl text-white">{resumeData.education.gpa}</p>
-                    {resumeData.education.honors.map((honor) => (
-                      <p key={honor} className="text-sm text-slate-300">
-                        {honor}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="glass-panel rounded-[28px] border border-white/10 p-6 shadow-glow-emerald">
-                  <p className="text-xs uppercase tracking-[0.24em] text-emerald/75">Achievement Snapshot</p>
-                  <div className="mt-4 space-y-3">
-                    {resumeData.achievements.slice(0, 3).map((achievement) => (
-                      <p key={achievement} className="text-sm leading-7 text-slate-300">
-                        {achievement}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </SectionReveal>
+            </Reveal>
           </div>
         </section>
 
-        <section id="experience" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <SectionHeading
-            eyebrow="Experience"
-            title="A timeline centered on applied ML, production data systems, and research-grade modeling."
-            description="The story here now reads more clearly as machine learning engineering work across search, research, and deployment-heavy environments."
+        <section id="experience" className="section-shell bg-ink-soft/55">
+          <SectionHeader
+            kicker="Experience"
+            title="Applied ML across finance, search, neuroscience, and seismic systems."
+            description="The through-line is data-heavy engineering: pipelines, classifiers, feature systems, and research workflows built with measurable outcomes."
           />
 
-          <SectionReveal className="mt-10 flex flex-wrap gap-3">
-            {experienceThemes.map((theme) => (
-              <span
-                key={theme}
-                className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-300"
-              >
-                {theme}
-              </span>
-            ))}
-          </SectionReveal>
+          <div className="mx-auto mt-16 max-w-7xl px-5 lg:px-8">
+            <div className="grid gap-5">
+              {resumeData.experience.map((item, index) => (
+                <Reveal key={`${item.company}-${item.role}`} delay={index * 0.04}>
+                  <article className="experience-card">
+                    <div className="lg:col-span-4">
+                      <p className="eyebrow text-emerald-200/80">{item.eyebrow}</p>
+                      <h3 className="mt-3 font-display text-2xl text-white sm:text-3xl">{item.company}</h3>
+                      <p className="mt-3 text-slate-300">{item.role}</p>
+                      <p className="mt-2 text-sm text-slate-500">
+                        {item.location} / {item.period}
+                      </p>
+                    </div>
 
-          <div className="relative mt-16 space-y-10">
-            <div className="timeline-glow absolute bottom-0 left-[12px] top-0 w-px md:left-1/2 md:-translate-x-px" />
-
-            {resumeData.experience.map((item, index) => (
-              <TimelineItem
-                key={`${item.company}-${item.role}`}
-                item={item}
-                index={index}
-                side={index % 2 === 0 ? 'right' : 'left'}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section id="skills" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <SectionHeading
-            eyebrow="Skills"
-            title="A toolkit that supports modeling, data pipelines, and production deployment."
-            description="The categories are still resume-backed, but the framing is now more explicitly aligned with applied ML engineering and supporting infrastructure work."
-          />
-
-          <div className="mt-14 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="grid gap-6 md:grid-cols-3">
-              {resumeData.skills.map((group, index) => (
-                <SectionReveal
-                  key={group.category}
-                  delay={index * 0.08}
-                  direction={index === 1 ? 'up' : index === 2 ? 'left' : 'right'}
-                  className="glass-panel rounded-[28px] border border-white/10 p-6 shadow-glow-blue"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs uppercase tracking-[0.26em] text-electric/75">{group.category}</p>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                      {group.items.length}
-                    </span>
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {group.items.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs uppercase tracking-[0.18em] text-slate-300"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </SectionReveal>
+                    <div className="lg:col-span-8">
+                      <div className="space-y-3 text-sm leading-7 text-slate-300 sm:text-base">
+                        {item.bullets.map((bullet) => (
+                          <p key={bullet}>{bullet}</p>
+                        ))}
+                      </div>
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {item.tech.map((tag) => (
+                          <span key={tag} className="chip-muted">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
               ))}
             </div>
-
-            <SectionReveal
-              direction="left"
-              delay={0.1}
-              className="glass-panel rounded-[32px] border border-white/10 p-6 shadow-glow-emerald sm:p-8"
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-emerald/75">Recognition</p>
-              <h3 className="mt-4 font-display text-3xl text-white">
-                Analytical range that extends well beyond day-to-day implementation work.
-              </h3>
-              <div className="mt-8 space-y-4">
-                {resumeData.achievements.map((achievement) => (
-                  <motion.div
-                    key={achievement}
-                    whileHover={{ x: 4 }}
-                    className="rounded-[22px] border border-white/10 bg-black/20 p-4"
-                  >
-                    <p className="text-sm leading-7 text-slate-300">{achievement}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </SectionReveal>
           </div>
         </section>
 
-        <section id="projects" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <SectionHeading
-            eyebrow="Selected Work"
-            title="A filterable gallery of ML systems, infrastructure work, and product-facing builds."
-            description="The projects are still interactive, but now the section reads more clearly as a mix of modeling work, pipeline engineering, and production-ready technical systems."
+        <section id="projects" className="section-shell">
+          <SectionHeader
+            kicker="Projects"
+            title="Selected builds with measurable technical outcomes."
+            description="A compact view of the systems and research tools that best represent how I think about engineering."
           />
 
-          <SectionReveal className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-3">
-              {projectFilters.map((filter) => {
-                const isActive = selectedProjectFilter === filter;
-
-                return (
-                  <button
-                    key={filter}
-                    type="button"
-                    onClick={() => setSelectedProjectFilter(filter)}
-                    className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] transition ${
-                      isActive
-                        ? 'border-electric/30 bg-electric/10 text-electric-soft'
-                        : 'border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:text-white'
-                    }`}
-                  >
-                    {filter}
-                  </button>
-                );
-              })}
-            </div>
-
-            <p className="text-sm text-slate-400">
-              Showing {filteredProjects.length} project{filteredProjects.length === 1 ? '' : 's'}.
-            </p>
-          </SectionReveal>
-
-          <SectionReveal className="mt-6 text-sm text-slate-500">
-            Hover on desktop or tap on mobile to reveal the build story on each card.
-          </SectionReveal>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {filteredProjects.map((project, index) => (
-              <ProjectCard key={project.title} project={project} index={index} />
-            ))}
-          </div>
-        </section>
-
-        <section id="contact" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <SectionHeading
-            eyebrow="Contact"
-            title="A cleaner closing section for ML roles, technical collaboration, and engineering conversations."
-            description="The form still stays lightweight, but the section now reads more like a strong endpoint for internships, research collaboration, and machine learning engineering roles."
-          />
-
-          <div className="mt-14 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            <SectionReveal className="glass-panel rounded-[32px] border border-white/10 p-7 shadow-glow-blue sm:p-8">
-              <p className="text-xs uppercase tracking-[0.26em] text-electric/75">Direct Reach</p>
-              <h3 className="mt-4 font-display text-3xl text-white">
-                Let&apos;s talk about product engineering, ML, or high-performance systems.
-              </h3>
-              <p className="mt-4 text-sm leading-7 text-slate-300">
-                Email is the fastest route for recruiting conversations, internships, collaboration ideas, or technical
-                projects that need both system depth and product polish. The form on the right now sends directly to my
-                inbox instead of opening a draft.
-              </p>
-
-              <div className="mt-8 space-y-5 text-sm text-slate-300">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Email</p>
-                  <a href={`mailto:${resumeData.personal.email}`} className="mt-2 block text-base text-white">
-                    {resumeData.personal.email}
-                  </a>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-500">LinkedIn</p>
-                  <a
-                    href={resumeData.personal.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 block text-base text-white"
-                  >
-                    shravan-balaji
-                  </a>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-500">GitHub</p>
-                  <a
-                    href={resumeData.personal.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 block text-base text-white"
-                  >
-                    Predicate-dev
-                  </a>
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {contactLinks.map((link) => (
-                  <motion.a
-                    key={link.label}
-                    href={link.href}
-                    target={link.href.startsWith('http') ? '_blank' : undefined}
-                    rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition hover:border-electric/30 hover:text-white"
-                  >
-                    {link.label}
-                  </motion.a>
-                ))}
-
-                <motion.button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] transition ${
-                    copiedEmail
-                      ? 'border-emerald/30 bg-emerald/10 text-emerald-soft'
-                      : 'border-white/10 bg-white/[0.03] text-slate-200 hover:border-emerald/30 hover:text-white'
-                  }`}
-                >
-                  {copiedEmail ? 'Email Copied' : 'Copy Email'}
-                </motion.button>
-              </div>
-            </SectionReveal>
-
-            <SectionReveal direction="left" delay={0.12}>
-              <motion.form
-                onSubmit={handleSubmit}
-                whileHover={{ y: -4 }}
-                className="glass-panel rounded-[32px] border border-white/10 p-7 shadow-glow-emerald sm:p-8"
+          <Reveal className="mx-auto mt-10 flex max-w-7xl flex-wrap justify-center gap-3 px-5 lg:px-8">
+            {projectFilters.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setSelectedProjectFilter(filter)}
+                className={selectedProjectFilter === filter ? 'filter-active' : 'filter-button'}
               >
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="mb-2 block text-xs uppercase tracking-[0.22em] text-slate-500">Name</span>
-                    <input
-                      className="field-shell"
-                      type="text"
-                      name="name"
-                      autoComplete="name"
-                      required
-                      value={formState.name}
-                      onChange={handleChange}
-                      placeholder="Jane Smith"
-                    />
-                  </label>
+                {filter}
+              </button>
+            ))}
+          </Reveal>
 
-                  <label className="block">
-                    <span className="mb-2 block text-xs uppercase tracking-[0.22em] text-slate-500">Email</span>
-                    <input
-                      className="field-shell"
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      required
-                      value={formState.email}
-                      onChange={handleChange}
-                      placeholder="jane@company.com"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="mb-2 block text-xs uppercase tracking-[0.22em] text-slate-500">
-                      Organization
-                    </span>
-                    <input
-                      className="field-shell"
-                      type="text"
-                      name="organization"
-                      autoComplete="organization"
-                      value={formState.organization}
-                      onChange={handleChange}
-                      placeholder="Company or team"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="mb-2 block text-xs uppercase tracking-[0.22em] text-slate-500">Message</span>
-                    <textarea
-                      className="field-shell min-h-[170px] resize-none"
-                      name="message"
-                      required
-                      value={formState.message}
-                      onChange={handleChange}
-                      placeholder="Tell me a bit about the role, project, or idea."
-                    />
-                  </label>
-
-                  <label className="hidden" aria-hidden="true">
-                    <span>Website</span>
-                    <input
-                      tabIndex={-1}
-                      autoComplete="off"
-                      className="field-shell"
-                      type="text"
-                      name="website"
-                      value={formState.website}
-                      onChange={handleChange}
-                    />
-                  </label>
-                </div>
-
-                <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <motion.button
-                    type="submit"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    disabled={isSubmitting}
-                    className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </motion.button>
-
-                  <div aria-live="polite" className="text-sm">
-                    {feedback.message ? (
-                      <p className={feedback.type === 'error' ? 'text-rose-300' : 'text-emerald-soft'}>
-                        {feedback.message}
-                      </p>
+          <div className="mx-auto mt-12 grid max-w-7xl gap-5 px-5 md:grid-cols-2 lg:px-8">
+            {filteredProjects.map((project, index) => (
+              <Reveal key={project.title} delay={index * 0.05}>
+                <article className="project-card">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="eyebrow text-emerald-200/80">{project.category}</p>
+                      <h3 className="mt-3 font-display text-2xl text-white">{project.title}</h3>
+                    </div>
+                    {project.link ? (
+                      <a href={project.link} target="_blank" rel="noreferrer" className="text-sm text-emerald-200 hover:text-white">
+                        GitHub
+                      </a>
                     ) : (
-                      <p className="text-slate-500">
-                        Delivers directly to {resumeData.personal.email} through the contact API.
-                      </p>
+                      <span className="text-sm text-slate-500">Private</span>
                     )}
                   </div>
-                </div>
-              </motion.form>
-            </SectionReveal>
+                  <p className="mt-6 text-base leading-8 text-slate-300">{project.summary}</p>
+                  <div className="mt-6 grid gap-2">
+                    {project.impact.map((item) => (
+                      <p key={item} className="border-l border-emerald-300/30 pl-4 text-sm text-slate-300">
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {project.tech.map((tag) => (
+                      <span key={tag} className="chip-muted">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </article>
+              </Reveal>
+            ))}
           </div>
         </section>
-      </motion.main>
 
-      <footer className="mx-auto max-w-7xl px-6 pb-14 pt-6 lg:px-8">
-        <div className="glass-panel rounded-[28px] border border-white/10 px-6 py-5 sm:px-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-display text-xl text-white">{resumeData.personal.name}</p>
-              <p className="mt-2 text-sm text-slate-400">{resumeData.footer.note}</p>
-            </div>
+        <section id="skills" className="section-shell bg-ink-soft/55">
+          <SectionHeader
+            kicker="Skills"
+            title="A stack for model work, data movement, and deployment."
+            description="The toolkit spans programming fundamentals, cloud-backed pipelines, and applied machine learning workflows."
+          />
 
-            <div className="flex flex-wrap items-center gap-3">
-              {contactLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={link.href.startsWith('http') ? '_blank' : undefined}
-                  rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-                  className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-300 transition hover:border-electric/30 hover:text-white"
-                >
-                  {link.label}
-                </a>
-              ))}
-
-              <a
-                href="#home"
-                className="rounded-full border border-electric/20 bg-electric/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-electric-soft transition hover:border-electric/40"
-              >
-                Back to Top
-              </a>
-            </div>
+          <div className="mx-auto mt-14 grid max-w-7xl gap-5 px-5 lg:grid-cols-3 lg:px-8">
+            {resumeData.skills.map((group, index) => (
+              <Reveal key={group.category} delay={index * 0.06} className="content-panel p-6">
+                <p className="eyebrow text-emerald-200/80">{group.category}</p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <span key={item} className="chip-muted">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </Reveal>
+            ))}
           </div>
-        </div>
+
+          <Reveal className="mx-auto mt-5 max-w-7xl px-5 lg:px-8">
+            <div className="content-panel p-6">
+              <p className="eyebrow text-amber-200/80">Recognition</p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {resumeData.achievements.map((achievement) => (
+                  <p key={achievement} className="border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-300">
+                    {achievement}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </section>
+
+        <section id="contact" className="section-shell">
+          <SectionHeader
+            kicker="Contact"
+            title="Let us build something rigorous."
+            description="Reach out for ML engineering roles, quant development conversations, research collaboration, or technical projects with real data complexity."
+          />
+
+          <div className="mx-auto mt-14 grid max-w-7xl gap-6 px-5 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+            <Reveal className="content-panel p-6 sm:p-8">
+              <p className="eyebrow text-emerald-200/80">Direct</p>
+              <div className="mt-6 space-y-5 text-slate-300">
+                <a href={`mailto:${resumeData.personal.email}`} className="block text-lg text-white">
+                  {resumeData.personal.email}
+                </a>
+                <p>{resumeData.personal.phone}</p>
+                <p>{resumeData.personal.location}</p>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href={resumeData.personal.github} target="_blank" rel="noreferrer" className="btn-ghost">
+                  GitHub
+                </a>
+                <a href={resumeData.personal.linkedin} target="_blank" rel="noreferrer" className="btn-ghost">
+                  LinkedIn
+                </a>
+                <button type="button" onClick={copyEmail} className="btn-secondary">
+                  {copiedEmail ? 'Copied' : 'Copy Email'}
+                </button>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.08}>
+              <form onSubmit={handleSubmit} className="content-panel p-6 sm:p-8">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <label>
+                    <span className="form-label">Name</span>
+                    <input className="field-shell" name="name" value={formState.name} onChange={handleChange} required />
+                  </label>
+                  <label>
+                    <span className="form-label">Email</span>
+                    <input className="field-shell" name="email" type="email" value={formState.email} onChange={handleChange} required />
+                  </label>
+                  <label className="sm:col-span-2">
+                    <span className="form-label">Organization</span>
+                    <input className="field-shell" name="organization" value={formState.organization} onChange={handleChange} />
+                  </label>
+                  <label className="sm:col-span-2">
+                    <span className="form-label">Message</span>
+                    <textarea
+                      className="field-shell min-h-[160px] resize-none"
+                      name="message"
+                      value={formState.message}
+                      onChange={handleChange}
+                      required
+                    />
+                  </label>
+                  <label className="hidden" aria-hidden="true">
+                    Website
+                    <input tabIndex={-1} name="website" value={formState.website} onChange={handleChange} />
+                  </label>
+                </div>
+                <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <button type="submit" className="btn-primary">
+                    Send Message
+                  </button>
+                  <p className="text-sm text-slate-400" aria-live="polite">
+                    {feedback || `Replies go to ${resumeData.personal.email}`}
+                  </p>
+                </div>
+              </form>
+            </Reveal>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-slate-500">
+        <p>
+          {resumeData.personal.name} / {resumeData.personal.title}
+        </p>
       </footer>
     </div>
   );
